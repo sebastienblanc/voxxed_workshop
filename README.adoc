@@ -38,9 +38,10 @@ image::images/newRealm.png[]
 
 === Creating the client, the role, and the user
 
- * Now we need to define a client, which will be our Spring Boot app. Go to the “Clients” section and click the “create” button. We will call our client “product-app”
+ * Now we need to define a client, which will be our Spring Boot app. Go to the “Clients” section and click the “create” button. We will call our client 'product-app' 
 
- image::images/newClient.png[]
+
+image::images/newClient.png[]
 
  * On the next screen, we can keep the defaults and save.
 
@@ -517,12 +518,30 @@ From the `Installation` tab grab the `keycloak.json` and add it to `src/resource
 
 === Enabling CORS support in the `product-rest` services
 
-Before running our Web Application, we need first to enable CORS support in our Rest Service. It's pretty easy, in the `keycloak.json` of the `product-rest` add this :
+Before running our Web Application, we need first to enable CORS support in our `product-service`. We do that by adding a filter :
 
-[source, javascript]
+[source, java]
 ----
 
-quarkus.keycloak.enable-cors=true
+package org.sebi;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+
+@Provider
+public class CORSFilter implements ContainerResponseFilter {
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
+        responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
+        responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
+        responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+        responseContext.getHeaders().add("Access-Control-Max-Age", "1209600");
+    }
+}
 
 ----
 
@@ -533,11 +552,9 @@ Running the Web Application can be done with this command : `mvn clean compile q
 
 Access the Web App : `http://localhost:8082` , note that if you open this in a tab of a browser where you were already connected with the `product-app` you won't need to authenticate ;)
 
+=== Adding a NodeJS service
 
-== Conclusion
+Let's add now a third Microservice, build with NodeJS this time. 
 
-I hope you enjoyed this workshop, here is a list of useful resources :
 
-* link:https://www.gitbook.com/book/keycloak/documentation[Keycloak Documentation]
-* link:https://github.com/keycloak/keycloak-quickstarts[Keycloak Quickstarts]
-* link:https://developers.redhat.com/blog/2017/05/25/easily-secure-your-spring-boot-applications-with-keycloak/[Blog Post about Keycloak and Spring Boot]
+
