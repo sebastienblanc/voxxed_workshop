@@ -552,7 +552,7 @@ Running the Web Application can be done with this command : `mvn clean compile q
 
 Access the Web App : `http://localhost:8082` , note that if you open this in a tab of a browser where you were already connected with the `product-app` you won't need to authenticate ;)
 
-=== Adding a NodeJS service
+== Adding a third service with NodeJS
 
 Let's add now a third Microservice, build with NodeJS this time. 
 
@@ -645,13 +645,13 @@ Notice the second property `propagateHeaders` , this make sure our rest client w
 Restart `product-service` and use the web app or the `product-app` to call the service again. You should see a new produt coming from the NodeJS service. 
 
 
-=== Adding the Authorization layer (AuthZ)
+== Adding the Authorization layer (AuthZ)
 
 Until now we have done authentication with some basic RBAC (Role Based Access Control) but Keycloak also comes with a really complete authz layer.
 
 To start, let's move the RBAC from the app to Keycloak.
 
-==== Enabling authorization in Keycloak
+=== Enabling authorization in Keycloak
 
 Go to the `product-service` and switch the authorization : 
 
@@ -659,7 +659,7 @@ image::images/authz1.png[]
 
 Now go to the `Authorization` tab and hen select `resources`.
 
-==== Creating a new resource
+=== Creating a new resource
 
 Create a new resource : 
 
@@ -682,7 +682,7 @@ Save your policy and your permission and you're good on the Keycloak side.
 Last thing to do is to switch your service from `bearer-only` to confidential, also copy your secret for the next step. 
 
 
-==== Enabling Authz on the service side 
+=== Enabling Authz on the service side 
 
 Remove all the keycloak properties from `application.properties` and create a new file in the same folder called `keycloak.json`
 
@@ -716,7 +716,7 @@ We can now remove the `@RoleAllowed` annotation from our method since the RBAC i
 Try the service, it should just work as before. 
 
 
-==== Adding a new Role to the policy
+=== Adding a new Role to the policy
 
 To see the power of centralized RBAC, let's create a new realm role , for instance : `superuser` and let's update the policy we created before : 
 
@@ -725,13 +725,15 @@ image::images/rolePolicy.png[]
 
 Log in again with your user, you should not be able to access the service unless you assign the role `superuser` to your user.
 
-==== Adding a Time Policy
+=== Adding a Time Policy
 
 You can add a lot of different authorization policies, for instance let's add a policy based on time : 
 
 image::images/timepolicy.png[]
 
+== Limiting th Scope
 
+== The Gatekeeper
 
 
 
