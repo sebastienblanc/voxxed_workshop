@@ -552,6 +552,40 @@ Running the Web Application can be done with this command : `mvn clean compile q
 
 Access the Web App : `http://localhost:8082` , note that if you open this in a tab of a browser where you were already connected with the `product-app` you won't need to authenticate ;)
 
+
+=== Discoveing the user account pages
+
+You might have noticed an `account` button on the web app. 
+
+On this page you cam add some details to your profile but also set up 2FA for instance
+
+
+=== Adding a new Client Scope
+
+Let's add our avatar url to the token. And let's use a `Client Scope` for this since we might reuse it for other client : 
+
+image::images/avatar1.png[]
+
+Then create a mapper for this Client Scope :
+
+image::images/avatr2.png[]
+
+And inally add this attrivute to your user : 
+
+image::images/avatar3.png[]
+
+Don't forget to save !
+
+==== adding consent 
+
+Let's add a consent screen : 
+
+image::images/consent1.png[]
+
+
+Log out and Log in again !
+
+
 == Adding a third service with NodeJS
 
 Let's add now a third Microservice, build with NodeJS this time. 
