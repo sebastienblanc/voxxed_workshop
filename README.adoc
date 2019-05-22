@@ -556,5 +556,189 @@ Access the Web App : `http://localhost:8082` , note that if you open this in a t
 
 Let's add now a third Microservice, build with NodeJS this time. 
 
+In the app repo, go to `service-nodejs`. 
+
+Install the app : `npm install`
+
+Start the app : `npm start`
+
+=== Adding a REST client to the `product-service`
+
+Start by adding the rest client dependency : 
+
+[source, xml]
+----
+
+
+ <dependency>
+   <groupId>io.quarkus</groupId>
+   <artifactId>quarkus-smallrye-rest-client</artifactId>
+</dependency>
+
+----
+
+Now we define an interface for our client : 
+
+[source, java]
+----
+
+package org.sebi;
+
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+@Path("/premium/products")
+@RegisterRestClient
+@RegisterClientHeaders
+public interface PremiumService {
+
+    @GET
+    @Produces("application/text")
+    String getPremium();
+}
+
+----
+
+Now we can inject the client in our rest resource : 
+
+[source, java]
+----
+
+@Inject
+@RestClient
+PremiumService premiumService;
+
+
+----
+
+We update the method for retrieving the products : 
+
+[source, java]
+----
+
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+@RolesAllowed("user")
+public List<String> hello() {
+   String premiumProduct = premiumService.getPremium();
+   return Arrays.asList("Android", "Nokia", premiumProduct);
+}
+
+----
+
+And finally we add some configuration to our `application.properties` : 
+
+[source, bash]
+-----
+
+org.sebi.PremiumService/mp-rest/url=http://localhost:3000
+org.eclipse.microprofile.rest.client.propagateHeaders=Authorization
+
+-----
+
+Notice the second property `propagateHeaders` , this make sure our rest client will reuse the `jwt access token` seamlessly.
+
+
+Restart `product-service` and use the web app or the `product-app` to call the service again. You should see a new produt coming from the NodeJS service. 
+
+
+=== Adding the Authorization layer (AuthZ)
+
+Until now we have done authentication with some basic RBAC (Role Based Access Control) but Keycloak also comes with a really complete authz layer.
+
+To start, let's move the RBAC from the app to Keycloak.
+
+==== Enabling authorization in Keycloak
+
+Go to the `product-service` and switch the authorization : 
+
+image::images/authz1.png[]
+
+Now go to the `Authorization` tab and hen select `resources`.
+
+==== Creating a new resource
+
+Create a new resource : 
+
+image::images/authz2.png[]
+
+
+Now create a permission : 
+
+image::images/authz3.png[]
+
+
+From this same screen, you can also create the new policy of type `role` : 
+
+image::images/authz4.png[]
+
+
+Save your policy and your permission and you're good on the Keycloak side. 
+
+
+Last thing to do is to switch your service from `bearer-only` to confidential, also copy your secret for the next step. 
+
+
+==== Enabling Authz on the service side 
+
+Remove all the keycloak properties from `application.properties` and create a new file in the same folder called `keycloak.json`
+
+
+[source, javascript]
+----
+
+
+{
+  "realm": "voxxed",
+  "auth-server-url": "http://localhost:8180/auth",
+  "ssl-required": "external",
+  "resource": "product-service",
+  "credentials": {
+    "secret": "you_client_secret"
+  },
+  "confidential-port": 0,
+  "policy-enforcer": {
+    "path-cache" : {
+      "lifespan" : 0
+    }
+  },
+  "enable-cors" : true
+}
+
+----
+
+
+We can now remove the `@RoleAllowed` annotation from our method since the RBAC is handled on the Keycloak side. 
+
+Try the service, it should just work as before. 
+
+
+==== Adding a new Role to the policy
+
+To see the power of centralized RBAC, let's create a new realm role , for instance : `superuser` and let's update the policy we created before : 
+
+image::images/rolePolicy.png[]
+
+
+Log in again with your user, you should not be able to access the service unless you assign the role `superuser` to your user.
+
+==== Adding a Time Policy
+
+You can add a lot of different authorization policies, for instance let's add a policy based on time : 
+
+image::images/timepolicy.png[]
+
+
+
+
+
+
+
+
+
+
 
 
