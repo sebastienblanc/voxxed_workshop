@@ -501,11 +501,14 @@ Restart the app and it should just work as before.
 
 == Adding a Web Application
 
+Clone this repo : https://github.com/sebastienblanc/voxxed-apps
+
+
 Now that we have a separate rest service, we can built a third application that will consume this service.
 
 Let's see how a Pure Web App can be secured with Keycloak and consume a secured rest service.
 
-From the apps repo browse to the `product-web` folder, this is AngularJS app.
+From the apps repo browse to the `quarkus-front` folder. 
 
 [NOTE]
 For convenience, this app has been wrapped inside a Quarkus Application. But you can put this in any Web Server (Apache, Node, etc...)
