@@ -772,6 +772,27 @@ image::images/timepolicy.png[]
 
 == The Gatekeeper
 
+Download the Keycloak gatekeeper
+
+=== Start the PHP server
+
+
+=== Start the Gatekeeper
+
+[source, bash]
+----
+
+./keycloak-gatekeeper --resources="uri=/public|white-listed=true" --resources="uri=/secured|roles=user|methods=GET" --resources="uri=/admin|roles=admin|methods=GET" --client-id=php-rest --client-secret=b9bd100a-db63-404b-810c-f5abe8f8ae6b --discovery-url=http://localhost:8180/auth/realms/voxxed/.well-known/openid-configuration --listen=0.0.0.0:9090 --enable-logging=true --enable-json-logging=true --upstream-url=http://localhost:8080 --cors-origins='*' --skip-openid-provider-tls-verify=true --no-redirects=true --cors-methods="GET" --cors-methods="POST" --cors-headers="*" --add-claims=preferred_username
+
+----
+
+=== Update the web client to call the PHP service instead
+
+The Gatekeeper is listing on port `9090`
+
+
+
+
 
 
 
