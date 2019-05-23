@@ -417,6 +417,7 @@ quarkus.keycloak.realm=voxxed
 quarkus.keycloak.auth-server-url=http://localhost:8180/auth
 quarkus.keycloak.resource=product-service
 quarkus.keycloak.bearer-only=true
+quarkus.keycloak.credentials.secret=secret_of_your_client
 quarkus.http.port=8081
 
 ----
@@ -489,7 +490,6 @@ Then, we can inject this bean in our service class :
 @Autowired
 private KeycloakRestTemplate template;
 
-@Override
 public List<String> getProducts() {
   ResponseEntity<String[]> response = template.getForEntity("http://localhost:8081/products", String[].class);
   return Arrays.asList(response.getBody());
